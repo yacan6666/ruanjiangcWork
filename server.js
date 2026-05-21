@@ -253,11 +253,21 @@ app.get('/api/deliverymen/online', (req, res) => {
 
 app.use(express.static(path.join(__dirname, '.')));
 
-app.get('*', (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/canteen.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'canteen.html'));
+});
+
+app.get('/deliveryman.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'deliveryman.html'));
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = app;
