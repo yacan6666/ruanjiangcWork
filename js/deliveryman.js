@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://ruanjiangc-work.vercel.app';
 let currentDeliveryman = null;
 let currentOrder = null;
 let refreshInterval = null;
