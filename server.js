@@ -1,13 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
+const path = require('path');
 
 const app = express();
-const PORT = 3000;
-
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static('.'));
+app.use(express.json());
 
 let students = [
     { id: '2024001', name: '张三', password: '123456', balance: 100 },
@@ -50,8 +47,6 @@ let orders = [
     }
 ];
 
-let nextOrderId = 2;
-
 app.post('/api/student/login', (req, res) => {
     const { id, password } = req.body;
     const student = students.find(s => s.id === id && s.password === password);
@@ -86,6 +81,62 @@ app.get('/api/menu', (req, res) => {
     res.json({ success: true, menu });
 });
 
+app.get('/api/menu/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const item = menu.find(m => m.id === id);
+    if (item) {
+        res.json({ success: true, item });
+    } else {
+        res.json({ success: false, message: '菜品不存在' });
+    }
+});
+
+app.post('/api/menu', (req, res) => {
+    const { name, price, description, category, image } = req.body;
+    if (!name || !price) {
+        return res.json({ success: false, message: '请填写菜品名称和价格' });
+    }
+    const newId = menu.length > 0 ? Math.max(...menu.map(m => m.id)) + 1 : 1;
+    const newItem = {
+        id: newId,
+        name,
+        price: parseFloat(price),
+        description: description || '',
+        category: category || 'hot',
+        image: image || 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=delicious%20food&image_size=square'
+    };
+    menu.push(newItem);
+    res.json({ success: true, item: newItem, message: '菜品添加成功' });
+});
+
+app.put('/api/menu/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const { name, price, description, category, image } = req.body;
+    const index = menu.findIndex(m => m.id === id);
+    if (index === -1) {
+        return res.json({ success: false, message: '菜品不存在' });
+    }
+    menu[index] = {
+        ...menu[index],
+        name: name || menu[index].name,
+        price: price !== undefined ? parseFloat(price) : menu[index].price,
+        description: description !== undefined ? description : menu[index].description,
+        category: category || menu[index].category,
+        image: image || menu[index].image
+    };
+    res.json({ success: true, item: menu[index], message: '菜品更新成功' });
+});
+
+app.delete('/api/menu/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const index = menu.findIndex(m => m.id === id);
+    if (index === -1) {
+        return res.json({ success: false, message: '菜品不存在' });
+    }
+    menu.splice(index, 1);
+    res.json({ success: true, message: '菜品删除成功' });
+});
+
 app.post('/api/order/create', (req, res) => {
     const { studentId, studentName, items, totalPrice, address } = req.body;
     const student = students.find(s => s.id === studentId);
@@ -95,7 +146,6 @@ app.post('/api/order/create', (req, res) => {
     if (student.balance < totalPrice) {
         return res.json({ success: false, message: '余额不足' });
     }
-    
     const order = {
         id: `DD${Date.now()}`,
         studentId,
@@ -107,10 +157,8 @@ app.post('/api/order/create', (req, res) => {
         canteenId: 'c001',
         address
     };
-    
     orders.push(order);
     student.balance -= totalPrice;
-    
     res.json({ success: true, order });
 });
 
@@ -137,6 +185,11 @@ app.get('/api/orders/delivering', (req, res) => {
 app.get('/api/orders/student/:studentId', (req, res) => {
     const studentOrders = orders.filter(o => o.studentId === req.params.studentId);
     res.json({ success: true, orders: studentOrders });
+});
+
+app.get('/api/orders/deliveryman/:deliverymanId', (req, res) => {
+    const deliverymanOrders = orders.filter(o => o.deliverymanId === req.params.deliverymanId && o.status === 'delivering');
+    res.json({ success: true, orders: deliverymanOrders });
 });
 
 app.post('/api/order/accept', (req, res) => {
@@ -193,88 +246,18 @@ app.post('/api/order/deliver', (req, res) => {
     res.json({ success: true, order });
 });
 
-app.get('/api/orders/deliveryman/:deliverymanId', (req, res) => {
-    const deliverymanOrders = orders.filter(o => o.deliverymanId === req.params.deliverymanId && o.status === 'delivering');
-    res.json({ success: true, orders: deliverymanOrders });
-});
-
 app.get('/api/deliverymen/online', (req, res) => {
     const onlineDeliverymen = deliverymen.filter(d => d.status === 'online');
     res.json({ success: true, deliverymen: onlineDeliverymen });
 });
 
-app.get('/api/menu', (req, res) => {
-    res.json({ success: true, menu });
+app.use(express.static(path.join(__dirname, '.')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/api/menu/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const item = menu.find(m => m.id === id);
-    if (item) {
-        res.json({ success: true, item });
-    } else {
-        res.json({ success: false, message: '菜品不存在' });
-    }
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
-
-app.post('/api/menu', (req, res) => {
-    const { name, price, description, category, image } = req.body;
-    
-    if (!name || !price) {
-        return res.json({ success: false, message: '请填写菜品名称和价格' });
-    }
-    
-    const newId = menu.length > 0 ? Math.max(...menu.map(m => m.id)) + 1 : 1;
-    const newItem = {
-        id: newId,
-        name,
-        price: parseFloat(price),
-        description: description || '',
-        category: category || 'hot',
-        image: image || 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=delicious%20food&image_size=square'
-    };
-    
-    menu.push(newItem);
-    res.json({ success: true, item: newItem, message: '菜品添加成功' });
-});
-
-app.put('/api/menu/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const { name, price, description, category, image } = req.body;
-    const index = menu.findIndex(m => m.id === id);
-    
-    if (index === -1) {
-        return res.json({ success: false, message: '菜品不存在' });
-    }
-    
-    menu[index] = {
-        ...menu[index],
-        name: name || menu[index].name,
-        price: price !== undefined ? parseFloat(price) : menu[index].price,
-        description: description !== undefined ? description : menu[index].description,
-        category: category || menu[index].category,
-        image: image || menu[index].image
-    };
-    
-    res.json({ success: true, item: menu[index], message: '菜品更新成功' });
-});
-
-app.delete('/api/menu/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const index = menu.findIndex(m => m.id === id);
-    
-    if (index === -1) {
-        return res.json({ success: false, message: '菜品不存在' });
-    }
-    
-    menu.splice(index, 1);
-    res.json({ success: true, message: '菜品删除成功' });
-});
-
-module.exports = app;
-
-if (require.main === module) {
-    app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
-    });
-}

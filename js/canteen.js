@@ -1,4 +1,4 @@
-const API_URL = 'https://ruanjiangc-work.vercel.app/api';
+const API_URL = '/api';
 let currentCanteen = null;
 let currentOrder = null;
 let refreshInterval = null;
@@ -10,7 +10,7 @@ async function canteenLogin(event) {
     const password = document.getElementById('canteenPassword').value;
     
     try {
-        const response = await fetch(`${API_URL}?path=canteen/login`, {
+        const response = await fetch(`${API_URL}/canteen/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -60,7 +60,7 @@ async function loadOrders() {
 
 async function loadMenu() {
     try {
-        const response = await fetch(`${API_URL}?path=menu`);
+        const response = await fetch(`${API_URL}/menu`);
         const data = await response.json();
         if (data.success) {
             renderMenu(data.menu);
@@ -116,7 +116,7 @@ function openAddMenuModal() {
 
 async function openEditMenuModal(id) {
     try {
-        const response = await fetch(`${API_URL}?path=menu/${id}`);
+        const response = await fetch(`${API_URL}/menu/${id}`);
         const data = await response.json();
         if (data.success) {
             const item = data.item;
@@ -159,13 +159,13 @@ async function saveMenu(event) {
     try {
         let response;
         if (id) {
-            response = await fetch(`${API_URL}?path=menu/${id}`, {
+            response = await fetch(`${API_URL}/menu/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(menuData)
             });
         } else {
-            response = await fetch(`${API_URL}?path=menu`, {
+            response = await fetch(`${API_URL}/menu`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(menuData)
@@ -191,7 +191,7 @@ async function deleteMenu(id) {
     }
     
     try {
-        const response = await fetch(`${API_URL}?path=menu/${id}`, {
+        const response = await fetch(`${API_URL}/menu/${id}`, {
             method: 'DELETE'
         });
         
@@ -221,7 +221,7 @@ document.getElementById('menuImage').addEventListener('input', function() {
 
 async function loadPendingOrders() {
     try {
-        const response = await fetch(`${API_URL}?path=orders/pending`);
+        const response = await fetch(`${API_URL}/orders/pending`);
         const data = await response.json();
         if (data.success) {
             renderOrders('pendingOrders', data.orders, 'pending');
@@ -234,7 +234,7 @@ async function loadPendingOrders() {
 
 async function loadCookingOrders() {
     try {
-        const response = await fetch(`${API_URL}?path=orders/cooking`);
+        const response = await fetch(`${API_URL}/orders/cooking`);
         const data = await response.json();
         if (data.success) {
             renderOrders('cookingOrders', data.orders, 'cooking');
@@ -247,7 +247,7 @@ async function loadCookingOrders() {
 
 async function loadReadyOrders() {
     try {
-        const response = await fetch(`${API_URL}?path=orders/ready`);
+        const response = await fetch(`${API_URL}/orders/ready`);
         const data = await response.json();
         if (data.success) {
             renderOrders('readyOrders', data.orders, 'ready');
@@ -365,7 +365,7 @@ function showOrderDetail(orderId, status) {
 
 async function acceptOrder(orderId) {
     try {
-        const response = await fetch(`${API_URL}?path=order/accept`, {
+        const response = await fetch(`${API_URL}/order/accept`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId })
@@ -386,7 +386,7 @@ async function acceptOrder(orderId) {
 
 async function completeOrder(orderId) {
     try {
-        const response = await fetch(`${API_URL}?path=order/complete`, {
+        const response = await fetch(`${API_URL}/order/complete`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId })

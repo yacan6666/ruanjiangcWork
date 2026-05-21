@@ -1,4 +1,4 @@
-const API_URL = 'https://ruanjiangc-work.vercel.app/api';
+const API_URL = '/api';
 let currentDeliveryman = null;
 let currentOrder = null;
 let refreshInterval = null;
@@ -10,7 +10,7 @@ async function deliverymanLogin(event) {
     const password = document.getElementById('deliverymanPassword').value;
     
     try {
-        const response = await fetch(`${API_URL}?path=deliveryman/login`, {
+        const response = await fetch(`${API_URL}/deliveryman/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, password })
@@ -56,7 +56,7 @@ async function loadOrders() {
 
 async function loadReadyOrders() {
     try {
-        const response = await fetch(`${API_URL}?path=orders/ready`);
+        const response = await fetch(`${API_URL}/orders/ready`);
         const data = await response.json();
         if (data.success) {
             renderReadyOrders(data.orders);
@@ -69,7 +69,7 @@ async function loadReadyOrders() {
 
 async function loadDeliveringOrders() {
     try {
-        const response = await fetch(`${API_URL}?path=orders/deliveryman/${currentDeliveryman.id}`);
+        const response = await fetch(`${API_URL}/orders/deliveryman/${currentDeliveryman.id}`);
         const data = await response.json();
         if (data.success) {
             renderDeliveringOrders(data.orders);
@@ -163,7 +163,7 @@ async function grabOrder(orderId) {
     }
     
     try {
-        const response = await fetch(`${API_URL}?path=order/grab`, {
+        const response = await fetch(`${API_URL}/order/grab`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -241,7 +241,7 @@ function showOrderDetail(orderId, status) {
 
 async function deliverOrder(orderId) {
     try {
-        const response = await fetch(`${API_URL}?path=order/deliver`, {
+        const response = await fetch(`${API_URL}/order/deliver`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId })
