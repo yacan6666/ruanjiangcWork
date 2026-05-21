@@ -1,4 +1,4 @@
-const API_URL = 'https://ruanjiangc-work.vercel.app';
+const API_URL = 'https://ruanjiangc-work.vercel.app/api';
 let currentCanteen = null;
 let currentOrder = null;
 let refreshInterval = null;

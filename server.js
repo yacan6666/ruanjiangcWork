@@ -271,6 +271,10 @@ app.delete('/api/menu/:id', (req, res) => {
     res.json({ success: true, message: '菜品删除成功' });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+module.exports = app;
+
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}
