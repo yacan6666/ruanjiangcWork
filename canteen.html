@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食堂管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body class="canteen-body">
+    <div class="login-page" id="loginPage">
+        <div class="login-container">
+            <div class="login-logo">
+                <i class="fa fa-building"></i>
+                <h2>食堂管理系统</h2>
+            </div>
+            <form class="login-form" id="canteenLoginForm">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="canteenUsername" placeholder="请输入用户名（如：canteen1）">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="canteenPassword" placeholder="请输入密码（如：canteen123）">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">登录</button>
+                <p class="back-link" onclick="goBack()">返回首页</p>
+            </form>
+        </div>
+    </div>
+
+    <div class="dashboard-page" id="dashboardPage" style="display: none;">
+        <header class="dashboard-header">
+            <div class="header-left">
+                <i class="fa fa-building"></i>
+                <span>食堂管理系统</span>
+            </div>
+            <div class="header-right">
+                <span id="canteenName">第一食堂</span>
+                <button class="btn btn-outline" onclick="logout()">退出登录</button>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <div class="stats-row">
+                <div class="stat-card pending">
+                    <div class="stat-icon">
+                        <i class="fa fa-clock-o"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-num" id="pendingCount">0</span>
+                        <span class="stat-text">待接单</span>
+                    </div>
+                </div>
+                <div class="stat-card cooking">
+                    <div class="stat-icon">
+                        <i class="fa fa-fire"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-num" id="cookingCount">0</span>
+                        <span class="stat-text">制作中</span>
+                    </div>
+                </div>
+                <div class="stat-card ready">
+                    <div class="stat-icon">
+                        <i class="fa fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-num" id="readyCount">0</span>
+                        <span class="stat-text">已完成</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showTab('pending')">待接单</button>
+                    <button class="tab-btn" onclick="showTab('cooking')">制作中</button>
+                    <button class="tab-btn" onclick="showTab('ready')">已完成</button>
+                    <button class="tab-btn" onclick="showTab('menu')">菜品管理</button>
+                </div>
+
+                <div class="tab-content">
+                    <div class="tab-panel active" id="pendingPanel">
+                        <div class="order-list" id="pendingOrders">
+                            <p class="empty-state">暂无待接单订单</p>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="cookingPanel">
+                        <div class="order-list" id="cookingOrders">
+                            <p class="empty-state">暂无制作中订单</p>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="readyPanel">
+                        <div class="order-list" id="readyOrders">
+                            <p class="empty-state">暂无已完成订单</p>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="menuPanel">
+                        <div class="menu-management">
+                            <div class="menu-header">
+                                <h3>菜品列表</h3>
+                                <button class="btn btn-primary" onclick="openAddMenuModal()">
+                                    <i class="fa fa-plus"></i> 添加菜品
+                                </button>
+                            </div>
+                            <div class="menu-grid" id="canteenMenuGrid">
+                                <p class="empty-state">加载中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal" id="orderDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>订单详情</h3>
+                <button class="close-btn" onclick="closeModal()">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="order-detail" id="orderDetail">
+            </div>
+            <div class="modal-actions" id="modalActions">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="successModal">
+        <div class="modal-content success-content">
+            <div class="success-icon">
+                <i class="fa fa-check-circle"></i>
+            </div>
+            <h3>操作成功！</h3>
+            <p id="successMessage"></p>
+            <button class="btn btn-primary btn-full" onclick="closeModal()">确定</button>
+        </div>
+    </div>
+
+    <div class="modal" id="errorModal">
+        <div class="modal-content error-content">
+            <div class="error-icon">
+                <i class="fa fa-times-circle"></i>
+            </div>
+            <h3>操作失败</h3>
+            <p id="errorMessage"></p>
+            <button class="btn btn-primary btn-full" onclick="closeModal()">确定</button>
+        </div>
+    </div>
+
+    <div class="modal" id="menuModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="menuModalTitle">添加菜品</h3>
+                <button class="close-btn" onclick="closeModal()">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <form class="menu-form" id="menuForm">
+                <input type="hidden" id="menuId">
+                <div class="form-group">
+                    <label>菜品名称 *</label>
+                    <input type="text" id="menuName" placeholder="请输入菜品名称" required>
+                </div>
+                <div class="form-group">
+                    <label>价格 *</label>
+                    <input type="number" id="menuPrice" placeholder="请输入价格" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>分类</label>
+                    <select id="menuCategory">
+                        <option value="hot">热销</option>
+                        <option value="new">新品</option>
+                        <option value="discount">优惠</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <textarea id="menuDescription" placeholder="请输入菜品描述" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>图片链接</label>
+                    <input type="text" id="menuImage" placeholder="请输入图片链接（可选）">
+                </div>
+                <div class="form-group" id="menuPreviewGroup" style="display: none;">
+                    <label>图片预览</label>
+                    <div class="menu-preview">
+                        <img id="menuPreviewImage" src="" alt="图片预览">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">保存</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/canteen.js"></script>
+</body>
+</html>
