@@ -8,7 +8,7 @@
     "dev": "node server.js"
   },
   "dependencies": {
-    "express": "^5.2.1",
+    "express": "^4.18.2",
     "cors": "^2.8.5"
   },
   "keywords": ["campus", "delivery", "food", "restaurant"],
