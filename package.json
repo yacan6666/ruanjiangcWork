@@ -8,9 +8,8 @@
     "dev": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "body-parser": "^1.20.2"
+    "express": "^5.2.1",
+    "cors": "^2.8.5"
   },
   "keywords": ["campus", "delivery", "food", "restaurant"],
   "author": "",
