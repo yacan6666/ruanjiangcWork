@@ -5,7 +5,7 @@ let currentStudent = null;
 
 async function loadMenu() {
     try {
-        const response = await fetch(`${API_URL}/menu`);
+        const response = await fetch(`${API_URL}?path=menu`);
         const data = await response.json();
         if (data.success) {
             menu = data.menu;
@@ -157,7 +157,7 @@ async function checkout() {
     const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     
     try {
-        const response = await fetch(`${API_URL}/order/create`, {
+        const response = await fetch(`${API_URL}?path=order/create`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -209,7 +209,7 @@ async function studentLogin(event) {
     const password = document.getElementById('studentPassword').value;
     
     try {
-        const response = await fetch(`${API_URL}/student/login`, {
+        const response = await fetch(`${API_URL}?path=student/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, password })
